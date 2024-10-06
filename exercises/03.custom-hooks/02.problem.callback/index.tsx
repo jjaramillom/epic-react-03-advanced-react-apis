@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import {
 	type BlogPost,
@@ -28,15 +28,18 @@ export function useSearchParams() {
 	}, [])
 
 	// 🐨 wrap this function in useCallback
-	function setSearchParams(...args: Parameters<typeof setGlobalSearchParams>) {
-		const searchParams = setGlobalSearchParams(...args)
-		setSearchParamsState((prevParams) => {
-			return prevParams.toString() === searchParams.toString()
-				? prevParams
-				: searchParams
-		})
-		return searchParams
-	}
+	const setSearchParams = useCallback(
+		(...args: Parameters<typeof setGlobalSearchParams>) => {
+			const searchParams = setGlobalSearchParams(...args)
+			setSearchParamsState((prevParams) => {
+				return prevParams.toString() === searchParams.toString()
+					? prevParams
+					: searchParams
+			})
+			return searchParams
+		},
+		[],
+	)
 	// 💰 note, this function doesn't have any dependencies so you can use [] as the dependency array
 
 	return [searchParams, setSearchParams] as const

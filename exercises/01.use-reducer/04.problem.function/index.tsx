@@ -4,25 +4,25 @@ import * as ReactDOM from 'react-dom/client'
 type State = { count: number }
 // 🦺 make it so the action can be a function which accepts State and returns Partial<State>
 type Action = Partial<State>
-const countReducer = (state: State, action: Action) => ({
+const countReducer = (
+	state: State,
+	action: Action | ((state: State) => Partial<State>),
+) => ({
 	...state,
-	// 🐨 if the action is a function, then call it with the state and spread the results,
-	// otherwise, just spread the results (as it is now).
-	...action,
+	...(typeof action === 'function' ? action(state) : action),
 })
 
 function Counter({ initialCount = 0, step = 1 }) {
 	const [state, setState] = useReducer(countReducer, {
 		count: initialCount,
 	})
-	const { count } = state
-	// 🐨 update these calls to use the callback form. Use the currentState given
-	// to you by the callback form of setState when calculating the new state.
-	const increment = () => setState({ count: count + step })
-	const decrement = () => setState({ count: count - step })
+	const increment = () =>
+		setState(({ count }: State) => ({ count: count + step }))
+	const decrement = () =>
+		setState(({ count }: State) => ({ count: count - step }))
 	return (
 		<div className="counter">
-			<output>{count}</output>
+			<output>{state.count}</output>
 			<div>
 				<button onClick={decrement}>⬅️</button>
 				<button onClick={increment}>➡️</button>

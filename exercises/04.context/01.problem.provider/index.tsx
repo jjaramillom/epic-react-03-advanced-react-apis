@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import {
+	useCallback,
+	useEffect,
+	useState,
+	createContext,
+	type ReactNode,
+	use,
+} from 'react'
 import * as ReactDOM from 'react-dom/client'
 import {
 	type BlogPost,
@@ -7,15 +14,15 @@ import {
 } from '#shared/blog-posts'
 import { setGlobalSearchParams } from '#shared/utils'
 
-// 🦺 create a SearchParamsTuple type here that's a readonly array of two elements:
-// - the first element is a URLSearchParams instance
-// - the second element is typeof setGlobalSearchParams
-// 🐨 create a SearchParamsContext that is of this type
-// 💰 let's start with this as the default value (we'll improve it next):
-// [new URLSearchParams(window.location.search), setGlobalSearchParams]
+type SearchParamsTuple = [URLSearchParams, typeof setGlobalSearchParams]
+
+const SearchParamsContext = createContext<SearchParamsTuple>([
+	new URLSearchParams(window.location.search),
+	setGlobalSearchParams,
+])
 
 // 🐨 change this to SearchParamsProvider and accept children
-export function useSearchParams() {
+export function SearchParamsProvider({ children }: { children: ReactNode }) {
 	const [searchParams, setSearchParamsState] = useState(
 		() => new URLSearchParams(window.location.search),
 	)
@@ -46,23 +53,28 @@ export function useSearchParams() {
 		[],
 	)
 
-	// 🐨 instead of returning this, render the SearchParamsContext and
-	// provide this tuple as the value
-	// 💰 make sure to render the children as well!
-	return [searchParams, setSearchParams] as const
+	return (
+		<SearchParamsContext value={[searchParams, setSearchParams]}>
+			{children}
+		</SearchParamsContext>
+	)
 }
 
+const useSearchParams = () => {
+	return use(SearchParamsContext)
+}
 // 🐨 create a useSearchParams hook here that returns use(SearchParamsContext)
 
 const getQueryParam = (params: URLSearchParams) => params.get('query') ?? ''
 
 function App() {
 	return (
-		// 🐨 wrap this in the SearchParamsProvider
-		<div className="app">
-			<Form />
-			<MatchingPosts />
-		</div>
+		<SearchParamsProvider>
+			<div className="app">
+				<Form />
+				<MatchingPosts />
+			</div>
+		</SearchParamsProvider>
 	)
 }
 

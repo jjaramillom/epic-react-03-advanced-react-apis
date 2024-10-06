@@ -11,11 +11,7 @@ type SearchParamsTuple = readonly [
 	URLSearchParams,
 	typeof setGlobalSearchParams,
 ]
-// 🦺 add "| null" to the type generic here
-const SearchParamsContext = createContext<SearchParamsTuple>(
-	// 🐨 remove this array and replace it with "null"
-	[new URLSearchParams(window.location.search), setGlobalSearchParams],
-)
+const SearchParamsContext = createContext<SearchParamsTuple | null>(null)
 
 function SearchParamsProvider({ children }: { children: React.ReactNode }) {
 	const [searchParams, setSearchParamsState] = useState(
@@ -59,7 +55,9 @@ function SearchParamsProvider({ children }: { children: React.ReactNode }) {
 
 export function useSearchParams() {
 	const context = use(SearchParamsContext)
-	// 🐨 if there's no context value, the throw an error with a helpful error message
+	if (!context) {
+		throw new Error('value was not provided')
+	}
 	return context
 }
 
@@ -67,11 +65,12 @@ const getQueryParam = (params: URLSearchParams) => params.get('query') ?? ''
 
 function App() {
 	return (
-		// 🐨 wrap this in the SearchParamsProvider again
-		<div className="app">
-			<Form />
-			<MatchingPosts />
-		</div>
+		<SearchParamsProvider>
+			<div className="app">
+				<Form />
+				<MatchingPosts />
+			</div>
+		</SearchParamsProvider>
 	)
 }
 

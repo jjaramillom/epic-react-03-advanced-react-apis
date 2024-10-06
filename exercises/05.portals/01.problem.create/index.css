@@ -23,7 +23,7 @@ body {
 		border-radius: 0.5rem;
 		/* 🦉 we disable this for now so we don't hide the tooltip issue */
 		/* 🐨 bring this back once you've created the portal */
-		/* overflow: hidden; */
+		overflow: hidden;
 		border: 1px solid #ddd;
 		width: 320px;
 		transition: transform 0.2s ease-in-out;
@@ -37,7 +37,7 @@ body {
 		&:has(*:active) {
 			/* 🦉 we disable this for now so we don't hide the tooltip issue */
 			/* 🐨 bring this back once you've created the portal */
-			/* transform: translate(0px, -6px); */
+			transform: translate(0px, -6px);
 		}
 
 		.post-image {

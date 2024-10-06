@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 type Position = {
 	left: number
@@ -36,12 +37,12 @@ export default function Tooltip({
 		tooltipX += window.scrollX
 		tooltipY += window.scrollY
 	}
-
 	// 🐨 put this inside a createPortal call and append it to the document.body
-	return (
+	return createPortal(
 		<TooltipContainer x={tooltipX} y={tooltipY} contentRef={ref}>
 			{children}
-		</TooltipContainer>
+		</TooltipContainer>,
+		document.body,
 	)
 }
 

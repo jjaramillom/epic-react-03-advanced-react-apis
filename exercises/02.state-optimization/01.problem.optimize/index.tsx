@@ -22,7 +22,11 @@ function App() {
 			// 3. compare the prevParams.toString() to newParams.toString()
 			// 4. if they're the same, return prevParams
 			// 5. if they're different, return newParams
-			setSearchParamsState(new URLSearchParams(window.location.search))
+			setSearchParamsState((prevState) => {
+				const newState = new URLSearchParams(window.location.search)
+				if (newState.toString() === prevState.toString()) return prevState
+				return newState
+			})
 		}
 		window.addEventListener('popstate', updateSearchParams)
 		return () => window.removeEventListener('popstate', updateSearchParams)
@@ -36,7 +40,11 @@ function App() {
 		// 2. compare the prevParams.toString() to searchParams.toString()
 		// 3. if they're the same, return prevParams
 		// 4. if they're different, return searchParams
-		setSearchParamsState(searchParams)
+		setSearchParamsState((prevState) => {
+			const newState = new URLSearchParams(window.location.search)
+			if (newState.toString() === prevState.toString()) return prevState
+			return newState
+		})
 		return searchParams
 	}
 

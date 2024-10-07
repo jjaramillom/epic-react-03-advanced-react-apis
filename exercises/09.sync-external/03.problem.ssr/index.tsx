@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { Suspense, useSyncExternalStore } from 'react'
 import * as ReactDOM from 'react-dom/client'
 
 export function makeMediaQueryStore(mediaQuery: string) {
@@ -32,7 +32,9 @@ function App() {
 			<div>This is your narrow screen state:</div>
 			{/* 🐨 wrap this in a Suspense component around this with a fallback prop of "" */}
 			{/* 📜 https://react.dev/reference/react/Suspense */}
-			<NarrowScreenNotifier />
+			<Suspense fallback={''}>
+				<NarrowScreenNotifier />
+			</Suspense>
 		</div>
 	)
 }
@@ -46,6 +48,12 @@ rootEl.innerHTML = (await import('react-dom/server')).renderToString(<App />)
 await new Promise((resolve) => setTimeout(resolve, 1000))
 
 const root = ReactDOM.hydrateRoot(rootEl, <App />, {
+	onRecoverableError: (error) => {
+		if (String(error).includes('Missing getServerSnapshot')) {
+			return
+		}
+		console.error(error)
+	},
 	// 💯 if you want to silence the error add a onRecoverableError function here
 	// and if the error includes 'Missing getServerSnapshot' then return early
 	// otherwise log the error so you don't miss any other errors.
